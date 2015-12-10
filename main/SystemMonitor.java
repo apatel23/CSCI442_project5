@@ -11,12 +11,12 @@ import gui.SystemMonitorWindow;
 
 public class SystemMonitor {
 	
-	final static int DEFUALT_INTERVAL = 5000;
-	static int interval = 500;
-	static Scheduler cpumemSched; // CPU and Memory scheduler
-	static Scheduler pidsSched; // PIDs (processes) scheduler 
-	static BufferedReader br;
-	static int cores;
+	final static int DEFUALT_INTERVAL = 5000; 	// default for PIDs
+	static int interval = 500; 					// default for CPU and mem threads
+	static Scheduler cpumemSched; 				// CPU and Memory scheduler
+	static Scheduler pidsSched; 				// PIDs (processes) scheduler 
+	static BufferedReader br; 					// BufferedReader to open files
+	static int cores;							// number of cores in current machine
 	
 	// This is called when the user selects a new update interval
 	// from the GUI
@@ -34,13 +34,13 @@ public class SystemMonitor {
 		// number of cores
 		cores = Runtime.getRuntime().availableProcessors();
 		
-		// ArrayList of type Harvester for CPU/memory scheduler and PIDs scheduler  
+		// ArrayLists of type Harvester for CPU/memory scheduler and PIDs scheduler  
 		ArrayList<Harvester> cpumemSchedList = new ArrayList<Harvester>();
 		ArrayList<Harvester> pidsSchedList = new ArrayList<Harvester>();
 
 		
-		// add to the ArrayList
-		cpumemSchedList.add(cpuSchedPopulate(mySysMon));
+		// add CPU and mem info to cpumemSchedList and PIDs info to pidsSchedList
+		cpumemSchedList.add(cpuSchedPopulate(mySysMon)); 
 		cpumemSchedList.add(memSchedPopulate(mySysMon));
 		pidsSchedList.add(pidsSchedPopulate(mySysMon));
 		
@@ -61,7 +61,11 @@ public class SystemMonitor {
 		pidsSched.start();
 	}
 
-	// populate the cpumemSched ArrayList from /proc/stat
+	/* cpuSchedPopulate(SystemMonitorWindow smw)
+	 * populates the cpumemSched ArrayList from /proc/stat
+	 * updates the GUI with CPU info 
+	 * returns a Harvester object
+	 */
 	private static Harvester cpuSchedPopulate(SystemMonitorWindow smw) {
 		// put initial info in step1, final info in step2, then use to calculate %
 		ArrayList<ArrayList<Integer>> step1 = new ArrayList<ArrayList<Integer>>();
@@ -132,21 +136,26 @@ public class SystemMonitor {
 		return h;
 	}
 
-
-	// populate the cpumemSched ArrayList from /proc/<pid> for every pid that exists
+	/* pidsSchedPopulate(SystemMonitorWindow smw)
+	 * populates the cpumemSched ArrayList from /proc/<pid> for every pid that exists
+	 * updates the GUI with the PIDs and their state
+	 * returns a Harvester object
+	 * ****use status for a human-readable approach
+	 * ****use stat for machine-oriented approach
+	 */
 	private static Harvester pidsSchedPopulate(SystemMonitorWindow smw) {
-		String name;
-		String pid;
-		String state;
-		String threads;
-		String voluntary;
-		String nonvoluntary;
+		String name = "";
+		String pid = "";
+		String state = "";
+		String threads = "";
+		String voluntary = "";
+		String nonvoluntary = "";
 		File directory;
 		String[] names;
 		String[] processInfo;
 		String status;
 		
-		directory = new File("/proc");
+		directory = new File("/proc"); // directory to start search of 
 		names = directory.list();
 		processInfo = new String[6];
 		status = "";
@@ -206,24 +215,25 @@ public class SystemMonitor {
 			e.printStackTrace();
 		}
 			
-		
-		
-		
-		
 		Harvester h = new Harvester();
 		return h;
 	}
 	
-	// populate the cpumemSched ArrayList from /proc/meminfo
+	
+	/* memSchedPopulate(SystemMonitorWindow smw)
+	 * populates the cpumemSched ArrayList from /proc/meminfo
+	 * updates the GUI with the memory info
+	 * returns a Harvester object
+	 */
 	private static Harvester memSchedPopulate(SystemMonitorWindow smw) {
-		int totalMem = 0;
-		int memFree = 0;
-		int memActive = 0;
-		int memInactive = 0;
-		int swapTotal = 0;
-		int swapFree = 0;
-		int dirtyPages = 0;
-		int writeback = 0;
+		int memTotal = 0; 	// total amount of physical RAM
+		int memFree = 0; 	// amount of physical RAM left unused
+		int active = 0; 	// buffer or cache memory in use
+		int inactive = 0; 	// buffer or cache memory that is free or unavailable
+		int swapTotal = 0; 	// total amount of swap available
+		int swapFree = 0; 	// total amount of swap free
+		int dirty = 0; 		// total amount of memory waiting to be written back to disk
+		int writeback = 0; 	// total amount of memory actively being written back to disk
 		
 		try {
 			// current line in /proc/meminfo
@@ -249,10 +259,10 @@ public class SystemMonitor {
 				// get write back
 				
 				// calculate RAM
-				int ram = ((totalMem - memFree)/totalMem)*100;
+				int ram = ((memTotal - memFree)/memTotal)*100;
 				
 				// update the GUI
-				smw.updateMemoryInfo(totalMem, memFree, memActive, memInactive, swapTotal, swapFree, dirtyPages, writeback);
+				smw.updateMemoryInfo(memTotal, memFree, active, inactive, swapTotal, swapFree, dirty, writeback);
 				smw.getCPUGraph().addDataPoint(cores, ram);
 			}
 			
@@ -273,9 +283,15 @@ public class SystemMonitor {
 		return h;
 	}
 	
-	// ( (time2 - time1)+(idleTime2 - idleTime1)+(mode2 - mode1) ) / 
-	// ( [All the stuff on top] + (task2 - task1) )
-	// * 100
+	
+	/*	calcCPUPercent(ArrayList<ArrayList<Integer>> step1, ArrayList<ArrayList<Integer>> step2, SystemMonitorWindow smw)
+	 *  calculates the CPU percentage and updates the GUI
+	 *  returns void
+	 *  Calculation for CPU percentage:
+	 *  ( (time2 - time1)+(idleTime2 - idleTime1)+(mode2 - mode1) ) / 
+	 *  ( [All the stuff on top] + (task2 - task1) ) * 100 
+	 */
+	 
 	private static void calcCPUPercent(ArrayList<ArrayList<Integer>> step1, ArrayList<ArrayList<Integer>> step2, SystemMonitorWindow smw) {
 		int time1 = 0;
 		int time2 = 0;
@@ -285,7 +301,6 @@ public class SystemMonitor {
 		int mode2 = 0;
 		int task1 = 0;
 		int task2 = 0;
-		
 		
 		// loop over the number of cores
 		for(int i = 0; i < cores; i++) {
@@ -303,7 +318,7 @@ public class SystemMonitor {
 		}
 		// end loop
 			
-		// calculation
+		// calculation: (top / bottom) * 100
 		double top = (time2 - time1) + (idleTime2 - idleTime1) + (mode2 - mode1);
 		double bottom = (top + (task2 - task1));
 		int calculation = (int) ((top / bottom) * 100);

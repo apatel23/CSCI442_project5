@@ -26,6 +26,11 @@ public class Harvester implements Runnable {
 		// TODO Auto-generated method stub
 	}
 	
+	
+	/* getCores()
+	 * use Runnable to find the number of cores in the current machine
+	 * return the number of cores (int)
+	 */
 	public int getCores() {
 		cores = Runtime.getRuntime().availableProcessors();
 		return cores;
