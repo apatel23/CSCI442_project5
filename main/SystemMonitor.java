@@ -155,53 +155,53 @@ public class SystemMonitor {
 		String[] processInfo;
 		String status;
 		
-		directory = new File("/proc"); // directory to start search of 
+		directory = new File("/proc"); // directory to start search of PIDs
 		names = directory.list();
 		processInfo = new String[6];
 		status = "";
 		
 		try {
 		
-		// clear out the process list
-		smw.removeAllRowsFromProcList();
-		
-		for(int i = 0; i < names.length; i++) {
+			// clear out the process list
+			smw.removeAllRowsFromProcList();
 			
-			// is it a directory?
-			// first check if an integer
-			if(true) {
-			
-				status = "/proc/" + names[i].toString() + "/status";
+			for(int i = 0; i < names.length; i++) {
 				
-				// current line
-				String line = "";
+				// is it a directory?
+				// first check if an integer
+				if(true) {
 				
-				
+					status = "/proc/" + names[i].toString() + "/status";
+					
+					// current line
+					String line = "";
+					
+					
 					br = new BufferedReader(new FileReader(status));
+					
+					
+					while((line = br.readLine()) != null) {
+						
+						// name
+						
+						// PID
+						
+						// state
+						
+						// threads
+						
+						// voluntary
+						
+						// non-voluntary
+						
+					} // end while
+	
+					// update GUI
+	
+				} // end if
 				
-				
-				while((line = br.readLine()) != null) {
-					
-					// name
-					
-					// pid
-					
-					// state
-					
-					// threads
-					
-					// voluntary
-					
-					// nonvoluntary
-					
-				}
 
-				// update gui
-
-			}
-				
-
-		}
+			} // end for
 				
 		} catch (FileNotFoundException e) { // catch for br
 			e.printStackTrace();
@@ -226,7 +226,7 @@ public class SystemMonitor {
 	 * returns a Harvester object
 	 */
 	private static Harvester memSchedPopulate(SystemMonitorWindow smw) {
-		int memTotal = 0; 	// total amount of physical RAM
+		int memTotal = 10; 	// total amount of physical RAM
 		int memFree = 0; 	// amount of physical RAM left unused
 		int active = 0; 	// buffer or cache memory in use
 		int inactive = 0; 	// buffer or cache memory that is free or unavailable
@@ -242,29 +242,67 @@ public class SystemMonitor {
 			br = new BufferedReader(new FileReader("/proc/meminfo"));
 			
 			while((line = br.readLine()) != null) {
+				
+				String [] a = line.split(" "); // break up the current line into an array, split by spaces, integer value will be 2nd to last element
+				//System.out.println("line: " + line);
+				
 				// get memory total
+				if(line.startsWith("MemTotal:")) {
+					//System.out.println("memTotal: " + a[a.length - 2]);
+					memTotal = Integer.parseInt(a[a.length - 2]);
+				}
 				
 				// get memory free
+				if(line.startsWith("MemFree:")) {
+					//System.out.println("memTotal: " + a[a.length - 2]);
+					memFree = Integer.parseInt(a[a.length - 2]);
+				}
 				
 				// get memory active
+				if(line.startsWith("Active:")) {
+					//System.out.println("Active: " + a[a.length - 2]);
+					active = Integer.parseInt(a[a.length - 2]);
+				}
 				
 				// get memory inactive
+				if(line.startsWith("Inactive:")) {
+					//System.out.println("Inactive: " + a[a.length - 2]);
+					inactive = Integer.parseInt(a[a.length - 2]);
+				}
 				
 				// get swap total
+				if(line.startsWith("SwapTotal:")) {
+					//System.out.println("SwapTotal: " + a[a.length - 2]);
+					swapTotal = Integer.parseInt(a[a.length - 2]);
+				}
 				
 				// get swap free
+				if(line.startsWith("SwapFree:")) {
+					//System.out.println("SwapFree: " + a[a.length - 2]);
+					swapFree = Integer.parseInt(a[a.length - 2]);
+				}
 				
 				// get dirty pages
+				if(line.startsWith("Dirty:")) {
+					//System.out.println("dirty: " + a[a.length - 2]);
+					dirty = Integer.parseInt(a[a.length - 2]);
+				}
 				
 				// get write back
+				if(line.startsWith("Writeback:")) {
+					//System.out.println("Writeback: " + a[a.length - 2]);
+					writeback = Integer.parseInt(a[a.length - 2]);
+				}
 				
-				// calculate RAM
-				int ram = ((memTotal - memFree)/memTotal)*100;
 				
-				// update the GUI
-				smw.updateMemoryInfo(memTotal, memFree, active, inactive, swapTotal, swapFree, dirty, writeback);
-				smw.getCPUGraph().addDataPoint(cores, ram);
 			}
+			
+			// calculate RAM
+			int ram = ((memTotal - memFree)/memTotal)*100;
+			
+			// update the GUI
+			smw.updateMemoryInfo(memTotal, memFree, active, inactive, swapTotal, swapFree, dirty, writeback);
+			smw.getCPUGraph().addDataPoint(cores, ram);
 			
 		} catch (FileNotFoundException e) { // catch for file
 			e.printStackTrace();
