@@ -2,7 +2,23 @@ package main;
 
 public class Harvester implements Runnable {
 	
-	int cores;
+	private int cores;
+	private SystemMonitorWindow smw;
+	
+	
+	public Harvester(SystemMonitorWindow smw, Boolean proc, Boolean mem, Boolean cpu) {
+		this.smw = smw;
+		
+		if(proc) {
+			collectProc();
+		} 
+		if(mem) {
+			collectMem();
+		}
+		if(cpu) {
+			collectCPU();
+		}
+	}
 
 	@Override
 	public void run() {
