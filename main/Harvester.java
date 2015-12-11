@@ -241,6 +241,7 @@ public class Harvester implements Runnable {
 			// calculate RAM
 			double dif = memTotal - memFree;
 			double ram = dif/memTotal;
+			ram = ram*100;
 			
 			// update the GUI
 			smw.updateMemoryInfo(memTotal, memFree, active, inactive, swapTotal, swapFree, dirty, writeback);
