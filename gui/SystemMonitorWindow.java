@@ -39,8 +39,9 @@ public class SystemMonitorWindow extends JFrame implements ActionListener{
 	 * to add data points to the CPU graph.
 	 * 
 	 * @return The CPUGraph associated with this SystemMonitorWindow
+	 * **** added synchronized to the method to avoid concurrency issues
 	 */
-	public SysGraph getCPUGraph()
+	public synchronized SysGraph getCPUGraph()
 	{
 		return CPUGraph;
 	}
@@ -52,16 +53,18 @@ public class SystemMonitorWindow extends JFrame implements ActionListener{
 	 * scrolling while updating
 	 * 
 	 * @param data
+	 * **** added synchronized to the method to avoid concurrency issues
 	 */
-	public void addRowToProcList(String[] data)
+	public synchronized void addRowToProcList(String[] data)
 	{
 		TableData.addRow(data);
 	}
 	
 	/**
 	 * Removes all rows from the process list JTable.
+	 * **** added synchronized to the method to avoid concurrency issues
 	 */
-	public void removeAllRowsFromProcList()
+	public synchronized void removeAllRowsFromProcList()
 	{
 		while (TableData.getRowCount() >= 1){
 			TableData.removeRow(0);
@@ -82,8 +85,9 @@ public class SystemMonitorWindow extends JFrame implements ActionListener{
 	 * @param swapFree The total swap free
 	 * @param dirtyPages The dirty pages
 	 * @param writeback The writeback
+	 * **** added synchronized to the method to avoid concurrency issues
 	 */
-	public void updateMemoryInfo(int totalMem, int memFree, int memActive, int memInactive, int swapTotal, int swapFree, int dirtyPages, int writeback)
+	public synchronized void updateMemoryInfo(int totalMem, int memFree, int memActive, int memInactive, int swapTotal, int swapFree, int dirtyPages, int writeback)
 	{
 		MemoryLabels[0].setText("Memory Total: " + totalMem + " KB");
 		MemoryLabels[1].setText("Memory Free: "+ memFree + " KB");
