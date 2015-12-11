@@ -1,5 +1,7 @@
 package main;
 
+import gui.SystemMonitorWindow;
+
 public class Harvester implements Runnable {
 	
 	private int cores;
@@ -10,13 +12,16 @@ public class Harvester implements Runnable {
 		this.smw = smw;
 		
 		if(proc) {
-			collectProc();
+			System.out.println("proc");
+			//collectProc();
 		} 
 		if(mem) {
-			collectMem();
+			System.out.println("proc");
+			//collectMem();
 		}
 		if(cpu) {
-			collectCPU();
+			System.out.println("proc");
+			//collectCPU();
 		}
 	}
 
