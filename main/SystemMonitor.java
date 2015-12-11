@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 
 import gui.SystemMonitorWindow;
@@ -17,6 +18,7 @@ public class SystemMonitor {
 	static Scheduler pidsSched; 				// PIDs (processes) scheduler 
 	static BufferedReader br; 					// BufferedReader to open files
 	static int cores;							// number of cores in current machine
+	
 	
 	// This is called when the user selects a new update interval
 	// from the GUI
@@ -40,10 +42,12 @@ public class SystemMonitor {
 
 		
 		// add CPU and mem info to cpumemSchedList and PIDs info to pidsSchedList
-		cpumemSchedList.add(cpuSchedPopulate(mySysMon)); 
-		cpumemSchedList.add(memSchedPopulate(mySysMon));
-		pidsSchedList.add(pidsSchedPopulate(mySysMon));
-		
+		//cpumemSchedList.add(cpuSchedPopulate(mySysMon)); 
+		//cpumemSchedList.add(memSchedPopulate(mySysMon));
+		//pidsSchedList.add(pidsSchedPopulate(mySysMon));
+		cpuSchedPopulate(mySysMon);
+		memSchedPopulate(mySysMon);
+		pidsSchedPopulate(mySysMon);
 
 		// create the Schedulers, cpumemSched uses interval specified by the user
 		// pidsSched uses the default interval of 5000 milliseconds
@@ -132,7 +136,7 @@ public class SystemMonitor {
 		// using the info stored in the step1 and step2 ArrayLists
 		// then update the Graph in the GUI
 		calcCPUPercent(step1, step2, smw);
-		Harvester h = new Harvester();
+		Harvester h = new Harvester(smw,false,false,true);
 		return h;
 	}
 
@@ -167,10 +171,11 @@ public class SystemMonitor {
 			
 			for(int i = 0; i < names.length; i++) {
 				
+				
 				// is it a directory?
 				// first check if an integer
-				if(true) {
-				
+				if(names[i].matches("^\\d+$")) { 
+					
 					status = "/proc/" + names[i].toString() + "/status";
 					
 					// current line
@@ -181,22 +186,50 @@ public class SystemMonitor {
 					
 					
 					while((line = br.readLine()) != null) {
+						//System.out.println(line);
 						
 						// name
+						if(line.startsWith("Name")) {
+							name = line.substring(line.indexOf(':')+1).trim();
+							//System.out.println("name: " + name);
+						}
 						
 						// PID
+						if(line.startsWith("Pid")) {
+							pid = line.substring(line.indexOf(':')+1).trim();
+							//System.out.println("pid: " + pid);
+						}
 						
 						// state
+						if(line.startsWith("State")) {
+							state = line.substring(line.indexOf(':')+1).trim();
+							//System.out.println("state: " + state);
+						}
 						
 						// threads
+						if(line.startsWith("Threads")) {
+							threads = line.substring(line.indexOf(':')+1).trim();
+							//System.out.println("threads: " + threads);
+						}
 						
 						// voluntary
+						if(line.startsWith("voluntary_ctxt_switches")) {
+							voluntary = line.substring(line.indexOf(':')+1).trim();
+							//System.out.println("voluntary: " + voluntary);
+						}
 						
 						// non-voluntary
+						if(line.startsWith("nonvoluntary_ctxt_switches")) {
+							nonvoluntary = line.substring(line.indexOf(':')+1).trim();
+							//System.out.println("nonvoluntary: " + nonvoluntary);
+						}
 						
 					} // end while
 	
 					// update GUI
+					// Order: {"Name", "pid", "State", "# Threads", "Vol ctxt sw", "nonVol ctxt sw"};
+					String [] data = {name, pid, state, threads, voluntary, nonvoluntary};
+					smw.addRowToProcList(data);
 	
 				} // end if
 				
@@ -215,7 +248,7 @@ public class SystemMonitor {
 			e.printStackTrace();
 		}
 			
-		Harvester h = new Harvester();
+		Harvester h = new Harvester(smw,true,false,false);
 		return h;
 	}
 	
@@ -226,7 +259,7 @@ public class SystemMonitor {
 	 * returns a Harvester object
 	 */
 	private static Harvester memSchedPopulate(SystemMonitorWindow smw) {
-		int memTotal = 10; 	// total amount of physical RAM
+		int memTotal = 0; 	// total amount of physical RAM
 		int memFree = 0; 	// amount of physical RAM left unused
 		int active = 0; 	// buffer or cache memory in use
 		int inactive = 0; 	// buffer or cache memory that is free or unavailable
@@ -234,6 +267,7 @@ public class SystemMonitor {
 		int swapFree = 0; 	// total amount of swap free
 		int dirty = 0; 		// total amount of memory waiting to be written back to disk
 		int writeback = 0; 	// total amount of memory actively being written back to disk
+		Harvester h = new Harvester(smw,false,true,false);
 		
 		try {
 			// current line in /proc/meminfo
@@ -298,11 +332,12 @@ public class SystemMonitor {
 			}
 			
 			// calculate RAM
-			int ram = ((memTotal - memFree)/memTotal)*100;
+			double dif = memTotal - memFree;
+			double ram = dif/memTotal;
 			
 			// update the GUI
 			smw.updateMemoryInfo(memTotal, memFree, active, inactive, swapTotal, swapFree, dirty, writeback);
-			smw.getCPUGraph().addDataPoint(cores, ram);
+			smw.getCPUGraph().addDataPoint(4, (int)ram);
 			
 		} catch (FileNotFoundException e) { // catch for file
 			e.printStackTrace();
@@ -317,7 +352,6 @@ public class SystemMonitor {
 		}
 		
 		
-		Harvester h = new Harvester();
 		return h;
 	}
 	
