@@ -47,7 +47,8 @@ public class Scheduler extends Thread {
 			// a for-each loop... For each Harvester h in Tasks...do...
 			for (Harvester h : taskList)
 			{
-				h.collect();
+				// wake up data extraction threads
+				h.notifyAll();
 			}
 		}
 	}
