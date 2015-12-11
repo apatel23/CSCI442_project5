@@ -128,6 +128,7 @@ public class SystemMonitorWindow extends JFrame implements ActionListener{
 		// of lines dynamic, I'd recommend passing in a variable.
 		CPUGraph = new SysGraph(0, 60, 0, 100, 5, 500);
 		
+		/*
 		// sample data
 		CPUGraph.addDataPoint(0, 20);
 		CPUGraph.addDataPoint(0, 100);
@@ -136,6 +137,7 @@ public class SystemMonitorWindow extends JFrame implements ActionListener{
 		CPUGraph.addDataPoint(2, 10);
 		CPUGraph.addDataPoint(2,50);
 		// end sample data
+		*/
 		
 		CPUGraph.setBorder(BorderFactory.createTitledBorder("CPU/Memory Usage"));
 		WindowPanel.add(CPUGraph);
