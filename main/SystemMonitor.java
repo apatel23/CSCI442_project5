@@ -25,7 +25,7 @@ public class SystemMonitor {
 	public static void setUpdateInterval(int updateInterval)
 	{
 		interval = updateInterval;
-		// TODO : set the delay for cpumemSched to interval
+		// set the delay for cpumemSched to interval
 		cpumemSched.setDelay(interval);
 	}
 	
@@ -69,7 +69,7 @@ public class SystemMonitor {
 	/* cpuSchedPopulate(SystemMonitorWindow smw)
 	 * populates the cpumemSched ArrayList from /proc/stat
 	 * updates the GUI with CPU info 
-	 * returns a Harvester object, specified as a CPU 
+	 * returns a Harvester object
 	 */
 	private static Harvester cpuSchedPopulate(SystemMonitorWindow smw) {
 		
@@ -80,7 +80,7 @@ public class SystemMonitor {
 	/* pidsSchedPopulate(SystemMonitorWindow smw)
 	 * populates the cpumemSched ArrayList from /proc/<pid> for every pid that exists
 	 * updates the GUI with the PIDs and their state
-	 * returns a Harvester object, specified as a process
+	 * returns a Harvester object
 	 * ****use status for a human-readable approach
 	 * ****use stat for machine-oriented approach
 	 */
@@ -93,7 +93,7 @@ public class SystemMonitor {
 	/* memSchedPopulate(SystemMonitorWindow smw)
 	 * populates the cpumemSched ArrayList from /proc/meminfo
 	 * updates the GUI with the memory info
-	 * returns a Harvester object, specified as memory
+	 * returns a Harvester object
 	 */
 	private static Harvester memSchedPopulate(SystemMonitorWindow smw) {
 		Harvester h = new Harvester(smw,false,true,false);
