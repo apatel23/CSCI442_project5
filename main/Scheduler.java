@@ -11,7 +11,7 @@ public class Scheduler extends Thread {
 	public Scheduler(int delay, ArrayList<Harvester> taskList)
 	{
 		// test
-		System.out.println("Scheduler delay: " + delay);
+		//System.out.println("Scheduler delay: " + delay);
 		this.delay = delay;
 		this.taskList = taskList;
 	}
@@ -26,7 +26,7 @@ public class Scheduler extends Thread {
 		// and wait for the specified timeout
 		try
 		{
-			wait(500);
+			wait(delay);
 		} catch (InterruptedException e) {}
 	}
 	
@@ -39,7 +39,7 @@ public class Scheduler extends Thread {
 			Thread thread = new Thread(harvester);
 			// start the thread
 			thread.start();
-			System.out.println("start thread");
+			//System.out.println("start thread");
 		}
 		
 		while (true)
