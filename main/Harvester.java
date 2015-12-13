@@ -11,6 +11,7 @@ import gui.SystemMonitorWindow;
 
 public class Harvester implements Runnable {
 	
+	final static numLines = 4;
 	private static int cores;
 	private SystemMonitorWindow smw;
 	private BufferedReader br;
@@ -365,9 +366,10 @@ public class Harvester implements Runnable {
 		int task2 = 0;
 		
 		// loop over the cores => max is 4 because only 5 lines on graph, one for RAM
-		for(int i = 0; i < 4; i++) {
+		for(int i = 0; i < numLines; i++) {
 			// step1
-			time1 = step1.get(i).get(0);
+			time1 = step1.g
+					et(i).get(0);
 			idleTime1 = step1.get(i).get(1);
 			mode1 = step1.get(i).get(2);
 			task1 = step1.get(i).get(3);
