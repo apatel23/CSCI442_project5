@@ -386,7 +386,7 @@ public class Harvester implements Runnable {
 			
 			// update the GUI
 			synchronized(smw) {
-				if(i < 4) { // only 4 lines for CPUs
+				if(i < 4) { // only 4 lines for CPUs on the graph
 					smw.getCPUGraph().addDataPoint(i, calculation);
 					smw.getCPUGraph().repaint();
 				}
