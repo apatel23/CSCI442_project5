@@ -365,7 +365,7 @@ public class Harvester implements Runnable {
 		int task2 = 0;
 		
 		// loop over the cores => max is 4 because only 5 lines on graph, one for RAM
-		for(int i = 0; i < cores; i++) {
+		for(int i = 0; i < 4; i++) {
 			// step1
 			time1 = step1.get(i).get(0);
 			idleTime1 = step1.get(i).get(1);
@@ -386,10 +386,8 @@ public class Harvester implements Runnable {
 			
 			// update the GUI
 			synchronized(smw) {
-				if(i < 4) { // only 4 lines for CPUs on the graph
-					smw.getCPUGraph().addDataPoint(i, calculation);
-					smw.getCPUGraph().repaint();
-				}
+				smw.getCPUGraph().addDataPoint(i, calculation);
+				smw.getCPUGraph().repaint();
 			}
 		}
 		// end loop
