@@ -11,8 +11,8 @@ import gui.SystemMonitorWindow;
 
 public class Harvester implements Runnable {
 	
-	final static numLines = 4;
 	private static int cores;
+	private static int numLines = 4;
 	private SystemMonitorWindow smw;
 	private BufferedReader br;
 	HarvesterType hType;
@@ -25,18 +25,20 @@ public class Harvester implements Runnable {
 		
 		if(proc) {
 			//System.out.println("proc");
-			collectProc(smw);
 			hType = HarvesterType.PROCESS;
+			collectProc(smw);
+			
 		} 
 		if(mem) {
 			//System.out.println("mem");
-			collectMem(smw);
 			hType = HarvesterType.MEMORY;
+			collectMem(smw);
+
 		}
 		if(cpu) {
 			//System.out.println("cpu");
-			collectCPU(smw);
 			hType = HarvesterType.CPU;
+			collectCPU(smw);
 		}
 	}
 
@@ -68,7 +70,6 @@ public class Harvester implements Runnable {
 	}
 
 
-	// collect process info from proc/<PID>/status, update the GUI process list
 	public void collectProc(SystemMonitorWindow smw) {
 		String name = "";
 		String pid = "";
@@ -99,7 +100,9 @@ public class Harvester implements Runnable {
 					// current line
 					String line = "";
 					
+					
 					br = new BufferedReader(new FileReader(status));
+					
 					
 					while((line = br.readLine()) != null) {
 						//System.out.println(line);
@@ -166,7 +169,6 @@ public class Harvester implements Runnable {
 	}
 	
 	
-	// collect memory info from proc/meminfo, calculate RAM, then update GUI
 	public void collectMem(SystemMonitorWindow smw) {
 		int memTotal = 0; 	// total amount of physical RAM
 		int memFree = 0; 	// amount of physical RAM left unused
@@ -244,10 +246,13 @@ public class Harvester implements Runnable {
 			double ram = dif/memTotal;
 			ram = ram*100;
 			
-			// update the GUI
+			// update the GUI, RAM is 5th line (4th index)
 			smw.updateMemoryInfo(memTotal, memFree, active, inactive, swapTotal, swapFree, dirty, writeback);
-			smw.getCPUGraph().addDataPoint(4, (int)ram);
-			System.out.println("RAM: " + ram);
+			if(cores > numLines) {
+				cores = numLines;
+			}
+			smw.getCPUGraph().addDataPoint(cores, (int)ram);
+			//System.out.println("RAM: " + ram);
 			
 		} catch (FileNotFoundException e) { // catch for file
 			e.printStackTrace();
@@ -263,7 +268,6 @@ public class Harvester implements Runnable {
 		
 	}
 	
-	// collect the CPU info from proc/stat in two steps, 250 ms delay in between
 	public void collectCPU(SystemMonitorWindow smw) {
 		// put initial info in step1, final info in step2, then use to calculate %
 		ArrayList<ArrayList<Integer>> step1 = new ArrayList<ArrayList<Integer>>();
@@ -366,11 +370,13 @@ public class Harvester implements Runnable {
 		int task1 = 0;
 		int task2 = 0;
 		
+		if(cores > numLines) {
+			cores = numLines;
+		}
 		// loop over the cores => max is 4 because only 5 lines on graph, one for RAM
-		for(int i = 0; i < numLines; i++) {
+		for(int i = 0; i < cores; i++) {
 			// step1
-			time1 = step1.g
-					et(i).get(0);
+			time1 = step1.get(i).get(0);
 			idleTime1 = step1.get(i).get(1);
 			mode1 = step1.get(i).get(2);
 			task1 = step1.get(i).get(3);
@@ -385,12 +391,14 @@ public class Harvester implements Runnable {
 			double top = (time2 - time1) + (idleTime2 - idleTime1) + (mode2 - mode1);
 			double bottom = (top + (task2 - task1));
 			int calculation = (int) ((top / bottom) * 100);
-			System.out.println("calculation: " + calculation);
+			//System.out.println("calculation: " + calculation);
 			
 			// update the GUI
 			synchronized(smw) {
-				smw.getCPUGraph().addDataPoint(i, calculation);
-				smw.getCPUGraph().repaint();
+				if(i < cores) { 
+					smw.getCPUGraph().addDataPoint(i, calculation);
+					smw.getCPUGraph().repaint();
+				}
 			}
 		}
 		// end loop
