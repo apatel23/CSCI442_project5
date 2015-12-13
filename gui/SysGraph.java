@@ -59,8 +59,9 @@ public class SysGraph extends JComponent {
 	 * Sets the update interval for the graph.  This ensures proper scaling.
 	 * 
 	 * @param updateIntervalMS
+	 * **** added synchronized to the method to avoid concurrency issues
 	 */
-	public void setUInt(int updateIntervalMS)
+	public synchronized void setUInt(int updateIntervalMS)
 	{
 		this.uIntVal = (int)((double)this.xMax / (updateIntervalMS/1000.0));
 	}
@@ -72,8 +73,9 @@ public class SysGraph extends JComponent {
 	 * @param lineNum The number of the line to add the data point value to.
 	 * This begins at index 0, not 1.
 	 * @param value The data point value
+	 * **** added synchronized to the method to avoid concurrency issues
 	 */
-	public void addDataPoint(int lineNum, int value)
+	public synchronized void addDataPoint(int lineNum, int value)
 	{
 		while ((DataPoints.get(lineNum)).size() >= this.uIntVal + 1)
 		{
@@ -175,7 +177,7 @@ public class SysGraph extends JComponent {
 			for (ArrayList<Integer> a : DataPoints)
 			{
 				g2.setColor(getEnumerableColor(index++));
-				for (int i = a.size() - 2; i >= 0; i--)
+				for (int i = a.size()-2; i >= 0; i--)
 				{
 					int x1 = (width+x) - (int)((a.size()-1-(i+1))*((double)width/(this.uIntVal)));
 					int x2 = (width+x) - (int)((a.size()-1-i) * ((double)width/(this.uIntVal)));
