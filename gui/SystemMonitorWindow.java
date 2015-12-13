@@ -190,9 +190,10 @@ public class SystemMonitorWindow extends JFrame implements ActionListener{
 
 	/* (non-Javadoc)
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 * **** added synchronized to the method to avoid concurrency issues
 	 */
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
+	public synchronized void actionPerformed(ActionEvent arg0) {
 		// This function handles our menu click event.  My code here is based off of how I implemented
 		// the interval code, if you do it differently, make appropriate changes.
 		JMenuItem j = (JMenuItem)arg0.getSource();
