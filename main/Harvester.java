@@ -68,6 +68,7 @@ public class Harvester implements Runnable {
 	}
 
 
+	// collect process info from proc/<PID>/status, update the GUI process list
 	public void collectProc(SystemMonitorWindow smw) {
 		String name = "";
 		String pid = "";
@@ -98,9 +99,7 @@ public class Harvester implements Runnable {
 					// current line
 					String line = "";
 					
-					
 					br = new BufferedReader(new FileReader(status));
-					
 					
 					while((line = br.readLine()) != null) {
 						//System.out.println(line);
@@ -167,6 +166,7 @@ public class Harvester implements Runnable {
 	}
 	
 	
+	// collect memory info from proc/meminfo, calculate RAM, then update GUI
 	public void collectMem(SystemMonitorWindow smw) {
 		int memTotal = 0; 	// total amount of physical RAM
 		int memFree = 0; 	// amount of physical RAM left unused
@@ -263,6 +263,7 @@ public class Harvester implements Runnable {
 		
 	}
 	
+	// collect the CPU info from proc/stat in two steps, 250 ms delay in between
 	public void collectCPU(SystemMonitorWindow smw) {
 		// put initial info in step1, final info in step2, then use to calculate %
 		ArrayList<ArrayList<Integer>> step1 = new ArrayList<ArrayList<Integer>>();
